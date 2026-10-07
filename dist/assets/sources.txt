@@ -1,0 +1,20 @@
+Home imagery (illustrative; not actual properties):
+Seoul — Ryoo Geon Uk / Unsplash
+https://unsplash.com/photos/a-view-of-a-large-city-with-tall-buildings-wBA-3MP911w
+Busan — Ahalya Suresh / Unsplash
+https://unsplash.com/photos/city-skyline-across-body-of-water-during-daytime-bGbTMfsKfKs
+Villa concept — John Fornander / Unsplash (location unconfirmed)
+https://unsplash.com/photos/white-concrete-building-with-swimming-pool-y3_AHHrxUBY
+https://unsplash.com/license
+
+Yacht imagery and original layout:
+Extracted from user-supplied 3. My Yacht.hwp, original BMP streams BIN0001–BIN0007.
+
+Model information and specification source:
+https://www.bavariayachts.com/sailing-yachts/c46/highlights/
+https://www.bavariayachts.com/sailing-yachts/c46/exterior/
+https://www.bavariayachts.com/sailing-yachts/c46/data-options/
+Checked 2026-10-07.
+
+3D runtime: Three.js 0.180.0 (MIT)
+https://github.com/mrdoob/three.js/blob/r180/LICENSE
