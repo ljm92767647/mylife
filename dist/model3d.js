@@ -1,7 +1,7 @@
 import {parcels,ramp,gardenPath,gates,fencePieces,estateOutline,garageOutline,outdoorStalls,outdoorAisles,garageAisles} from './site-layout.js';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {rooms,bounds,footprint,stalls} from './rooms.js';
+import {rooms,houseEntrances,bounds,footprint,stalls} from './rooms.js';
 import {furnishings} from './furniture.js';
 export function createModel(host,onSelect){
  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor('#e8eeec');renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;host.append(renderer.domElement);
@@ -34,7 +34,9 @@ export function createModel(host,onSelect){
  if(r.ensuite){const e=r.ensuite;box(r.x+e.w-.08,r.z,.16,e.d,h,'#dbe3dc',0,r.id);box(r.x,r.z+e.d-.08,e.w-1.1,.16,h,'#dbe3dc',0,r.id);box(r.x+e.w-1.1,r.z+e.d,.06,.9,options.lowWalls?.7:2.15,'#b59877',0,r.id);}
  }
  function drawFurniture(r){for(const f of furnishings(r)){
-  let {x,z,w,d,h,color,kind}=f;const id=r.id;
+  let {x,z,w,d,h,color,kind}=f;const id=r.id;const entryBase=activeLevel==='SITE'&&r.entrance?.18:0;
+  if(kind==='shoecabinet'){box(x,z,w,d,h,color,entryBase,id);for(let i=0;i<2;i++){box(x+.02+i*w/2,z+d-.025,w/2-.04,.035,h-.06,'#c3ae8b',entryBase+.03,id);box(x+w/2-.08+i*.16,z+d+.01,.025,.035,.12,'#576b62',entryBase+h*.52,id)}continue;}
+  if(kind==='slipperrack'){for(const xx of [x,x+w-.04])box(xx,z,.04,d,h,color,entryBase,id);for(let tier=0;tier<3;tier++){const y=entryBase+.08+tier*.23;box(x,z,w,d,.035,color,y,id);for(let pair=0;pair<2;pair++)for(let shoe=0;shoe<2;shoe++)box(x+.045+pair*.28+shoe*.105,z+.045,.085,.20,.04,'#eadfc5',y+.035,id)}continue;}
   if(kind==='screen'){const horizontal=f.face==='w'||f.face==='e';const gh=f.screenHeight||w*9/16;if(horizontal){box(x,z,w,d,gh,color,h-gh,id);box(f.face==='e'?x+w+.003:x-.02,z+.04,.02,d-.08,gh-.08,'#537a87',h-gh+.04,id)}else{box(x,z,w,d,gh,color,h-gh,id);box(x+.04,f.face==='s'?z+d+.003:z-.02,w-.08,.02,gh-.08,'#537a87',h-gh+.04,id)}continue;}
   if(kind==='floorbed'){box(x,z,w,d,.06,color,0,id);box(x+.05,z+.08,w-.1,.3,.05,'#fcfaf1',.06,id);continue}
   if(kind==='canopy'){for(const xx of [x,x+w])for(const zz of [z,z+d]){cylinder(xx-.02,zz-.02,.04,.04,h,'#7c8579',0,id);line([[xx,h-.05,zz],[xx+(xx===x?-1.5:1.5),.02,zz+(zz===z?-1.5:1.5)]],'#97a18a');}if(options.roofs){const geo=new THREE.BufferGeometry();const v=[x,h,z,x+w,h,z,x+w,h,z+d,x,h,z,x+w,h,z+d,x,h,z+d];geo.setAttribute('position',new THREE.Float32BufferAttribute(v,3));geo.computeVertexNormals();const o=new THREE.Mesh(geo,mat(color,{side:THREE.DoubleSide,transparent:true,opacity:.55}));o.position.set(-offset.x,0,-offset.z);root.add(o)}continue}
@@ -79,20 +81,35 @@ export function createModel(host,onSelect){
  if(id==='basket')for(const gx of [x+.8,x+w-.8]){cylinder(gx,z+d/2,.12,.12,3.6,'#59717a',0,id);box(gx-.025,z+d/2-.9,.05,1.8,1.05,'#d1e1df',2.9,id);const ring=new THREE.Mesh(new THREE.TorusGeometry(.225,.025,8,24),mat('#b98052'));ring.rotation.x=Math.PI/2;ring.position.set(gx+(gx<x+w/2?.35:-.35)-offset.x,3.05,z+d/2-offset.z);root.add(ring)}
  }
  function slab(points,color,y,height,room){const shape=new THREE.Shape();points.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();const geo=new THREE.ExtrudeGeometry(shape,{depth:height,bevelEnabled:false});geo.rotateX(Math.PI/2);const mesh=new THREE.Mesh(geo,mat(color));mesh.position.set(-offset.x,y+height,-offset.z);mesh.receiveShadow=true;if(room)mesh.userData.room=room;root.add(mesh);if(room)selectables.push(mesh);}
- function siteBuilding(){slab(footprint['1F'],'#e3e4d9',.18,3.1,'living');slab(footprint['2F'],'#d7ded3',3.28,3.1,'guest-b');slab(footprint['2F'],'#425b61',6.38,.15,'guest-b');for(const r of rooms.filter(r=>r.south)){const win=r.windows[0];box(r.x+win.at,r.z+r.d+.01,win.width,.04,1.8,'#58949b',r.level==='1F'?1:4,'living')}text('펜션 · 내부 보기',16,12,2.8,'living');}
+ function siteBuilding(){
+  // Reveal entry interiors in the massing view; the floor plans retain the complete envelope.
+  const westCut=[[0,8.6],[2.6,8.6],[2.6,6.4],[0,6.4]];
+  const ground=footprint['1F'].flatMap(p=>p[0]===11.5&&p[1]===18.8?[[18,18.8],[18,16.9],[11.5,16.9],p]:[p]).concat(westCut);
+  const upper=footprint['2F'].concat(westCut);
+  slab(footprint['1F'],'#acbdb7',.1,.08,'living');slab(ground,'#e3e4d9',.18,3.1,'living');slab(upper,'#d7ded3',3.28,3.1,'guest-b');slab(upper,'#425b61',6.38,.15,'guest-b');
+  for(const r of rooms.filter(r=>r.south)){const win=r.windows[0];box(r.x+win.at,r.z+r.d+.01,win.width,.04,1.8,'#58949b',r.level==='1F'?1:4,'living')}text('펜션 · 내부 보기',16,12,2.8,'living');
+ }
+ function entryFacade(r){const a=doorway(r,r.doors[0]),horizontal=a.axis==='x',lo=horizontal?r.x:r.z,hi=lo+a.length,base=activeLevel==='SITE'?.18:0,height=activeLevel==='SITE'?2.3:options.lowWalls?.75:2.2;
+  const segment=(from,to,h=height,y=base,color='#e3e4d9')=>{if(to-from<=0)return;horizontal?box(from,a.z-.08,to-from,.16,h,color,y,r.id):box(a.x-.08,from,.16,to-from,h,color,y,r.id)};
+  segment(lo,a.start);segment(a.end,hi);segment(a.start,a.end,.12,base+2.2,'#526f65');
+  for(const at of [a.start,a.end])segment(at-.04,at+.04,height,base,'#526f65');
+  if(a.o.sliding){segment(a.start,a.start+a.o.width*.25,height,base,'#84aaa9');segment(a.end-a.o.width*.25,a.end,height,base,'#84aaa9');}
+  else box(a.x,a.start,1,.065,height,'#b59877',base,r.id);
+  if(activeLevel==='SITE'){segment(lo,hi,.8,base+2.3);text(r.id==='entry-side'?'집 옆 현관 · 신발장 / 실내화':'주방 ↔ 테라스 · 신발장 / 실내화',r.x+r.w/2,r.z+r.d/2,1.5,r.id);}
+ }
  function parkingLines(list,aisles,room){for(const t of aisles)box(t.x,t.z,t.w,t.d,.015,'#adc4b7',.075,room);for(const t of list){box(t.x,t.z,t.w,t.d,.015,t.ev?'#bddfcd':'#d3ddd2',.08,room);line([[t.x,.12,t.z+t.d],[t.x,.12,t.z],[t.x+t.w,.12,t.z],[t.x+t.w,.12,t.z+t.d]],'#fbfcf5');text((t.ev?'EV ':'P')+t.number,t.x+t.w/2,t.z+t.d-.5,.7);}}
  function boundaries(){for(const f of fencePieces()){const length=f.end-f.start;if(f.axis==='x')box(f.start,f.z-.08,length,.16,1.5,'#869b83');else box(f.x-.08,f.start,.16,length,1.5,'#869b83');}
  for(const g of gates){const horizontal=g.axis==='x';for(const at of [0,g.width])box(g.x+(horizontal?at:0)-.08,g.z+(horizontal?0:at)-.08,.16,.16,1.8,'#506f65');const leaf=g.width/2;for(const at of [0,g.width]){if(horizontal)box(g.x+at-.025,g.z,.05,leaf,1.4,'#668980');else box(g.x,g.z+at-.025,leaf,.05,1.4,'#668980');}text(g.name,g.x+(horizontal?g.width/2:0),g.z+(horizontal?0:g.width/2),1.1);}}
  function drawRamp(base){const t=ramp;let vertices=[];const ranges=[0,3,31.8,34.8],levels=[base,base,base-3.6,base-3.6];for(let i=0;i<3;i++){const a=[t.x,levels[i],t.z+ranges[i]],b=[t.x+t.w,levels[i],t.z+ranges[i]],c=[t.x+t.w,levels[i+1],t.z+ranges[i+1]],d=[t.x,levels[i+1],t.z+ranges[i+1]];vertices.push(...a,...b,...c,...a,...c,...d)}const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geo.computeVertexNormals();const mesh=new THREE.Mesh(geo,mat('#a4b8b0',{side:THREE.DoubleSide}));mesh.position.set(-offset.x,0,-offset.z);root.add(mesh);box(t.landing.x,t.landing.z,t.landing.w,t.landing.d,.08,'#afc0b7',base-3.68);text('담장 밖 지하 진출입 · 6 m',-5,15,1.5);}
  function basementWalls(){const points=garageOutline;const height=options.lowWalls?.75:3.4;for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length];if(a[0]===b[0]){let lo=Math.min(a[1],b[1]),hi=Math.max(a[1],b[1]);if(a[0]===-5){box(-5.08,lo,.16,32.8-lo,height,'#d8e1d7');box(-5.08,38.8,.16,hi-38.8,height,'#d8e1d7')}else box(a[0]-.08,lo,.16,hi-lo,height,'#d8e1d7');}else box(Math.min(a[0],b[0]),a[1]-.08,Math.abs(b[0]-a[0]),.16,height,'#d8e1d7');}}
  function disposeRoot(){root.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material&&o.type==='Sprite'){o.material.map?.dispose();o.material.dispose()}if(o.material?.type==='LineBasicMaterial')o.material.dispose()});scene.remove(root);root=new THREE.Group();scene.add(root);selectables=[];floorMeshes=[];labelSprites=[];}
- function rebuild(level,selected,opt){activeLevel=level;options=opt;offset=level==='SITE'?{x:50,z:33}:level==='B1'?{x:16.5,z:18.5}:{x:18,z:10};disposeRoot();const list=rooms.filter(r=>r.level===level);if(level==='1F')list.push(rooms.find(r=>r.id==='bbq'));
+ function rebuild(level,selected,opt){activeLevel=level;options=opt;offset=level==='SITE'?{x:50,z:33}:level==='B1'?{x:16.5,z:18.5}:{x:18,z:10};disposeRoot();const list=rooms.filter(r=>r.level===level);if(level==='1F')list.push(rooms.find(r=>r.id==='bbq'));if(level==='SITE')list.push(...houseEntrances);
   if(level==='SITE'){for(const p of parcels)box(p.x,p.z,p.w,p.d,.12,p.id==='home'?'#d9e5d0':'#d0dec9',-.12);box(-12,-7,124,5,.06,'#bac5c0');box(38,73,74,5,.06,'#bac5c0');box(gardenPath.x,gardenPath.z,gardenPath.w,gardenPath.d,.025,'#c8c4b4',.01);siteBuilding();drawRamp(0);boundaries();parkingLines(outdoorStalls,outdoorAisles,'outdoor-parking');}
  else if(level==='B1'){slab(garageOutline,'#acbcb3',-.3,.3);drawRamp(3.6);basementWalls();}
  else slab(footprint[level],'#acbdb7',-.3,.3);
-  for(const r of list){if(r.id==='parking'){parkingLines(stalls,garageAisles,'parking');drawFurniture(r);text('44대 · EV 8 · 6 m 연결 통로',16,6.5,1.5,'parking');continue;}let f=box(r.x,r.z,r.w,r.d,.075,r.color,r.parent?.012:0,r.id);f.userData.baseColor=r.color;floorMeshes.push(f);
+  for(const r of list){if(r.id==='parking'){parkingLines(stalls,garageAisles,'parking');drawFurniture(r);text('44대 · EV 8 · 6 m 연결 통로',16,6.5,1.5,'parking');continue;}let f=box(r.x,r.z,r.w,r.d,.075,r.color,r.entrance&&level==='SITE'?.18:r.parent?.012:0,r.id);f.userData.baseColor=r.color;floorMeshes.push(f);
    if(r.id==='pool'){box(r.x,r.z,r.w,r.d,.13,'#68b6bd',.08,r.id,{roughness:.3});}
-   if((level!=='SITE'&&r.id!=='bbq')||r.indoor)roomWalls(r,list);if(r.id==='gym'){for(let xx=r.x;xx<r.x+r.w;xx++)line([[xx,.085,r.z],[xx,.085,r.z+r.d]],'#9bb3ae');for(let zz=r.z;zz<r.z+r.d;zz++)line([[r.x,.085,zz],[r.x+r.w,.085,zz]],'#9bb3ae');text('자유 주짓수 매트',r.x+4,r.z+12,1.7)}
+   if((level!=='SITE'&&r.id!=='bbq')||r.indoor)roomWalls(r,list);if(r.entrance)entryFacade(r);if(r.id==='gym'){for(let xx=r.x;xx<r.x+r.w;xx++)line([[xx,.085,r.z],[xx,.085,r.z+r.d]],'#9bb3ae');for(let zz=r.z;zz<r.z+r.d;zz++)line([[r.x,.085,zz],[r.x+r.w,.085,zz]],'#9bb3ae');text('자유 주짓수 매트',r.x+4,r.z+12,1.7)}
    if(r.id.startsWith('stairs'))drawStairs(r);else drawFurniture(r);
    if(['futsal','tennis','basket'].includes(r.id))court(r);
    if(r.indoor){for(const xx of [r.x+.12,r.x+r.w-.12])for(const zz of [r.z+.12,r.z+r.d-.12])box(xx-.07,zz-.07,.14,.14,r.height||3,'#8a9c97',0,r.id);}
