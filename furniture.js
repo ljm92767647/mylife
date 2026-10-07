@@ -26,6 +26,8 @@ export function furnishings(r){
   }
  }
  switch(r.id){
+ case 'entry-side':F('현관 벽붙임 신발장',.2,.0,1.2,.35,1.1,'#b39c7c','shoecabinet');F('현관 실내화 거치대',1.55,.0,.6,.3,.8,'#78968c','slipperrack');break;
+ case 'entry-terrace':F('테라스 입구 벽붙임 신발장',4.3,1.5,1.2,.35,1.1,'#b39c7c','shoecabinet');F('테라스 입구 실내화 거치대',5.7,1.55,.6,.3,.8,'#78968c','slipperrack');break;
  case 'parking':
   [0,3,6,12,18,25,33,40].forEach((i,k)=>{const s=stalls[i];F('P'+s.number+' · SUV 5.06 × 1.98 m',s.x-r.x+.36,s.z-r.z+.22,1.98,5.06,1.8,['#eef0e9','#527585','#293e48'][k%3],'car')});
   for(let i=0;i<8;i++)F('EV '+(i+1)+' 충전기',stalls[i].x-r.x+1.1,-1.8-r.z,.45,.25,1.3,'#3a9b82','charger');break;
