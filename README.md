@@ -2,6 +2,14 @@
 
 MY LIFESTYLE 웹사이트입니다. My Homes, 부산 외곽 펜션의 평면도·3D, BAVARIA C46 요트 소개로 구성되어 있습니다.
 
+## 웹사이트
+
+[MY LIFESTYLE 웹사이트 열기](https://ljm92767647.github.io/mylife/)
+
+[평면도와 3D 바로 보기](https://ljm92767647.github.io/mylife/residence.html)
+
+GitHub Pages는 `gh-pages` 브랜치의 루트에서 게시합니다. `main/dist` 소스를 수정한 뒤 게시용 브랜치에도 반영해야 합니다.
+
 ## 실행
 
 빌드나 패키지 설치 없이 정적 웹서버로 실행할 수 있습니다.
