@@ -70,7 +70,7 @@ update('tennis',{x:85.5,z:35,w:20.29,d:36.57,court:{x:3.66,z:6.4,w:10.97,d:23.77
 rooms.push(r('outdoor-parking','남쪽 야외 주차 · 14대','SITE',39.5,66,37.8,5.5,'service',['남쪽 14 · 중앙 14 · 동쪽 8구획','구획 2.7 × 5.5 m · 연결 통로 6 m 이상','운동시설 남쪽 차량 출입구'],{note:'코트·건물·보행 공간을 피한 세 구역에 총 36구획을 배치했습니다. 코트 안전 영역을 주차에 사용하지 않습니다.'}));
 rooms.push(r('outdoor-parking-n','중앙 야외 주차 · 14대','SITE',39.5,25.5,37.8,5.5,'service',['2.7 × 5.5 m 구획 14개','남쪽 6 m 통로']));rooms.push(r('outdoor-parking-e','동쪽 야외 주차 · 8대','SITE',85.5,20,21.6,5.5,'service',['2.7 × 5.5 m 구획 8개','남쪽 6 m 통로']));
 // Tighter living wing and pool-side camping; retain all five south-facing bedrooms.
-update('living',{w:11.5,d:6.8,items:['78.2 m² 열린 거실','서쪽 벽 100인치 TV · 4인 소파 2개','TV 시청 공간 · 동쪽 연결 동선'],note:'158.4 m²에서 78.2 m²로 축소했습니다. 서쪽 TV 앞에 소파·테이블을 모으고 동쪽은 부엌으로 이어지는 통로와 휴식 좌석으로 사용합니다.'});
+update('living',{w:11.5,d:6.8,items:['78.2 m² 열린 거실','서쪽 벽 100인치 TV · 4인 소파 2개','소파 뒤 8인 식탁 · 2.6 × 1.1 m','식탁 의자 8개 · 양옆 보행 통로 1 m 이상'],note:'서쪽 TV를 보는 소파 뒤 동쪽 공간에 2.6 × 1.1 m 8인 식탁과 의자 8개를 배치했습니다. 휴식용 원형 티 테이블과 의자는 제거했습니다. 의자를 놓은 상태에서 소파 쪽 약 1.10 m, 주방 쪽 약 1.05 m 보행 통로를 확보했습니다.'});
 update('bed-hall',{z:15.4,w:11.5,items:['주인방·작은 손님방 C 출입']});
 update('master',{z:16.8});update('guest-c',{z:16.8});update('guest-d',{level:'2F',x:16,z:8.6});
 update('kitchen',{x:11.5});update('billiard',{x:19.5});update('bbq',{x:11.5});
