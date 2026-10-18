@@ -81,7 +81,7 @@ update('fire-zone',{x:19,z:37.5});
 const sideDoor=rooms.find(r=>r.id==='hall-1').doors[0];
 const terraceDoor=rooms.find(r=>r.id==='kitchen').doors[0];
 rooms.push(r('entry-side','집 옆 현관','1F',0,6.4,2.6,2.2,'hall',['서쪽 집 옆 출입문 · 폭 1.4 m','벽붙임 신발장 1.2 × 0.35 m','실내화 거치대 0.6 × 0.3 m','수납 앞 보행 폭 1.85 m'],{entrance:true,doors:[{...sideDoor}],note:'서쪽 주택 대문에서 접근하는 공용 복도 현관입니다. 북쪽 벽에 수납을 모아 출입문과 복도 동선을 비웠습니다. 전체 부지 3D에서는 현관 내부를 볼 수 있도록 이 부분을 절개해 표시합니다.'}));
-rooms.push(r('entry-terrace','주방 · 지붕 테라스 출입구','1F',11.5,16.9,6.5,1.9,'hall',['주방 ↔ 지붕 테라스 슬라이딩문 · 폭 2.4 m','벽붙임 신발장 1.2 × 0.35 m','실내화 거치대 0.6 × 0.3 m','문 동쪽 벽 수납 · 출입 통로 유지'],{entrance:true,doors:[{...terraceDoor}],note:'주방 남쪽의 기존 문과 같은 위치입니다. 신발장과 실내화 거치대는 문 동쪽 실내 벽에 붙이고, 식탁 및 테라스 이동 동선을 피했습니다. 현관 영역에 별도 칸막이는 없습니다.'}));
+rooms.push(r('entry-terrace','주방 · 지붕 테라스 출입구','1F',11.5,16.9,6.5,1.9,'hall',['주방 ↔ 지붕 테라스 슬라이딩문 · 폭 2.4 m','벽붙임 신발장 0.8 × 0.28 m','실내화 거치대 0.6 × 0.3 m','문 동쪽 벽 수납 · 출입 통로 유지'],{entrance:true,doors:[{...terraceDoor}],note:'주방 남쪽의 기존 문과 같은 위치입니다. 신발장과 실내화 거치대는 문 동쪽 실내 벽에 붙이고, 식탁은 주방 안쪽으로 0.9 m 옮기고, 수납장은 폭 0.8 m·깊이 0.28 m로 줄여 의자와 출입 동선을 비웠습니다. 현관 영역에 별도 칸막이는 없습니다.'}));
 export const houseEntrances=rooms.filter(r=>r.entrance);
 export const levelNames={SITE:'전체 부지',B1:'지하 1층','1F':'1층','2F':'2층'};
 export const bounds={SITE:{x:-12,z:-7,w:124,d:85},B1:{x:-10,z:-5,w:51,d:47},'1F':{x:-2,z:-3,w:40,d:32},'2F':{x:-2,z:-3,w:40,d:23}};
