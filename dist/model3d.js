@@ -1,8 +1,8 @@
 import {parcels,ramp,gardenPath,gates,fencePieces,estateOutline,garageOutline,outdoorStalls,outdoorAisles,garageAisles} from './site-layout.js';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {rooms,houseEntrances,bounds,footprint,stalls} from './rooms.js?v=20261018-minimal';
-import {furnishings} from './furniture.js?v=20261018-minimal';
+import {rooms,houseEntrances,bounds,footprint,stalls} from './rooms.js?v=20261018-enclosed-entries';
+import {furnishings} from './furniture.js?v=20261018-enclosed-entries';
 export function createModel(host,onSelect){
  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor('#e8eeec');renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;host.append(renderer.domElement);
  const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(42,1,.1,600);const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.09;controls.maxPolarAngle=Math.PI*.48;controls.minDistance=5;controls.maxDistance=350;controls.target.set(0,0,0);
@@ -16,8 +16,8 @@ export function createModel(host,onSelect){
  function line(points,color='#fff',room=null){const g=new THREE.BufferGeometry().setFromPoints(points.map(([x,y,z])=>new THREE.Vector3(x-offset.x,y,z-offset.z)));const o=new THREE.Line(g,new THREE.LineBasicMaterial({color}));root.add(o);if(room)o.userData.room=room;return o}
  function text(content,x,z,size=2.3,room=null,color='#1c4142'){const c=document.createElement('canvas');const ctx=c.getContext('2d');ctx.font='600 30px Arial,"Malgun Gothic",sans-serif';c.width=Math.ceil(ctx.measureText(content).width)+28;c.height=60;ctx.fillStyle='#ffffffe6';ctx.beginPath();ctx.roundRect(1,1,c.width-2,58,8);ctx.fill();ctx.font='600 30px Arial,"Malgun Gothic",sans-serif';ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(content,c.width/2,31);const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,depthWrite:false}));sprite.position.set(x-offset.x,3.6,z-offset.z);const height=Math.max(.95,size*.45);sprite.scale.set(height*c.width/60,height,1);sprite.visible=options.labels;root.add(sprite);labelSprites.push(sprite);if(room)sprite.userData.room=room;return sprite}
  function doorway(r,o){let x=r.x,z=r.z,axis='x',length=r.w;if(o.side==='s')z+=r.d;if(o.side==='e')x+=r.w;if(o.side==='e'||o.side==='w'){axis='z';length=r.d}return {x,z,axis,length,start:(axis==='x'?x:z)+o.at,end:(axis==='x'?x:z)+o.at+o.width,o,r}}
- function roomWalls(r,list){if(r.type==='hall'&&!r.indoor)return;let h=options.lowWalls?.75:(r.height||2.85);
- const all=list.flatMap(v=>[...(v.doors||[]).map(o=>doorway(v,o)),...(v.windows||[]).map(o=>({...doorway(v,o),glass:true})),...(v.openSides||[]).map(side=>({...doorway(v,{side,at:0,width:['n','s'].includes(side)?v.w:v.d}),open:true}))]);
+ function roomWalls(r,list){if(r.type==='hall'&&!r.indoor&&!r.entrance)return;let h=options.lowWalls?.75:(r.height||2.85);
+ const all=(r.entrance?[r]:list).flatMap(v=>[...(v.doors||[]).map(o=>doorway(v,o)),...(v.windows||[]).map(o=>({...doorway(v,o),glass:true})),...(v.openSides||[]).map(side=>({...doorway(v,{side,at:0,width:['n','s'].includes(side)?v.w:v.d}),open:true}))]);
  for(const side of ['n','s','e','w']){let wall=doorway(r,{side,at:0,width:['n','s'].includes(side)?r.w:r.d});let start=wall.axis==='x'?wall.x:wall.z,end=start+wall.length;
  let openings=all.filter(a=>a.axis===wall.axis&&Math.abs((a.axis==='x'?a.z:a.x)-(wall.axis==='x'?wall.z:wall.x))<.05&&a.end>start&&a.start<end).sort((a,b)=>a.start-b.start);let at=start;
  function segment(from,to,height=h,y=0,clr='#e7e4d8'){if(to-from<.02||height<=0)return;if(wall.axis==='x')box(from,wall.z-.08,to-from,.16,height,clr,y,r.id);else box(wall.x-.08,from,.16,to-from,height,clr,y,r.id)}
@@ -27,7 +27,7 @@ export function createModel(host,onSelect){
  if(wall.axis==='x')box(st,wall.z-.035,span,.07,gh,a.o.privacy?'#dbe3dc':'#86bdc1',sill,r.id,opts);else box(wall.x-.035,st,.07,span,gh,'#86bdc1',sill,r.id,opts);
  if(a.o.sliding)text(slide?'통창 열림 · 외기 개방':'닫을 수 있는 슬라이딩 통창',r.x+r.w/2,r.z-.2,1.4);if(a.o.privacy){box(st+.05,wall.z-.08,.1,.12,gh,'#617870',sill,r.id);box(st+.1,wall.z+.02,.8,.06,gh,'#dbe3dc',sill,r.id)}if(a.o.privacy)text('불투명 환기창 · 10 cm 개방',r.x+5.9,r.z-.2,1.2);
  }}else if(!a.open){if(h>2.2)segment(st,en,h-2.2,2.2);
- if(a.r.id===r.id&&!a.o.vehicle){const leaf=Math.min(a.o.width,1);const y=options.lowWalls?.7:2.15;if(a.o.sliding){if(wall.axis==='x'){box(st,wall.z-.03,(en-st)*.25,.06,y,'#84aaa9',0,r.id);box(en-(en-st)*.25,wall.z-.03,(en-st)*.25,.06,y,'#84aaa9',0,r.id)}at=Math.max(at,en);continue;} // open door leaf remains visible in cutaway
+ if(a.r.id===r.id&&!a.o.vehicle){const leaf=Math.min(a.o.width,1);const y=options.lowWalls?.7:2.15;if(a.o.sliding){if(wall.axis==='x'){box(st,wall.z-.03,(en-st)*.25,.06,y,'#84aaa9',0,r.id);box(en-(en-st)*.25,wall.z-.03,(en-st)*.25,.06,y,'#84aaa9',0,r.id)}else{box(wall.x-.03,st,.06,(en-st)*.25,y,'#84aaa9',0,r.id);box(wall.x-.03,en-(en-st)*.25,.06,(en-st)*.25,y,'#84aaa9',0,r.id)}if(wall.axis==='x')box(st,wall.z-.05,en-st,.1,.045,'#526f65',y,r.id);else box(wall.x-.05,st,.1,en-st,.045,'#526f65',y,r.id);at=Math.max(at,en);continue;} // open door leaf remains visible in cutaway
  if(wall.axis==='x'){box(st,a.o.side==='s'?wall.z-leaf:wall.z,.065,leaf,y,'#b59877',0,r.id);box(st-.04,wall.z-.09,.08,.18,y+.05,'#6d7d71',0,r.id);box(en-.04,wall.z-.09,.08,.18,y+.05,'#6d7d71',0,r.id);if(a.o.width>1.6)box(en-.065,a.o.side==='s'?wall.z-leaf:wall.z,.065,leaf,y,'#b59877',0,r.id)}else{box(a.o.side==='e'?wall.x-leaf:wall.x,st,leaf,.065,y,'#b59877',0,r.id);box(wall.x-.09,st-.04,.18,.08,y+.05,'#6d7d71',0,r.id);box(wall.x-.09,en-.04,.18,.08,y+.05,'#6d7d71',0,r.id)}
  }}at=Math.max(at,en)}segment(at,end);
  }
@@ -84,18 +84,19 @@ export function createModel(host,onSelect){
  function siteBuilding(){
   // Reveal entry interiors in the massing view; the floor plans retain the complete envelope.
   const westCut=[[0,8.6],[2.6,8.6],[2.6,6.4],[0,6.4]];
-  const ground=footprint['1F'].flatMap(p=>p[0]===11.5&&p[1]===18.8?[[18,18.8],[18,16.9],[11.5,16.9],p]:[p]).concat(westCut);
+  const groundWest=[[0,8.6],[2.6,8.6],[2.6,8.2],[3.05,8.2],[3.05,6.8],[2.6,6.8],[2.6,6.4],[0,6.4]];
+  const ground=footprint['1F'].flatMap(p=>p[0]===11.5&&p[1]===18.8?[[18,18.8],[18,16.9],[12.85,16.9],[12.85,16.45],[11.65,16.45],[11.65,16.9],[11.5,16.9],p]:[p]).concat(groundWest);
   const upper=footprint['2F'].concat(westCut);
   slab(footprint['1F'],'#acbdb7',.1,.08,'living');slab(ground,'#e3e4d9',.18,3.1,'living');slab(upper,'#d7ded3',3.28,3.1,'guest-b');slab(upper,'#425b61',6.38,.15,'guest-b');
   for(const r of rooms.filter(r=>r.south)){const win=r.windows[0];box(r.x+win.at,r.z+r.d+.01,win.width,.04,1.8,'#58949b',r.level==='1F'?1:4,'living')}text('펜션 · 내부 보기',16,12,2.8,'living');
  }
- function entryFacade(r){const a=doorway(r,r.doors[0]),horizontal=a.axis==='x',lo=horizontal?r.x:r.z,hi=lo+a.length,base=activeLevel==='SITE'?.18:0,height=activeLevel==='SITE'?2.3:options.lowWalls?.75:2.2;
-  const segment=(from,to,h=height,y=base,color='#e3e4d9')=>{if(to-from<=0)return;horizontal?box(from,a.z-.08,to-from,.16,h,color,y,r.id):box(a.x-.08,from,.16,to-from,h,color,y,r.id)};
-  segment(lo,a.start);segment(a.end,hi);segment(a.start,a.end,.12,base+2.2,'#526f65');
-  for(const at of [a.start,a.end])segment(at-.04,at+.04,height,base,'#526f65');
-  if(a.o.sliding){segment(a.start,a.start+a.o.width*.25,height,base,'#84aaa9');segment(a.end-a.o.width*.25,a.end,height,base,'#84aaa9');}
-  else box(a.x,a.start,1,.065,height,'#b59877',base,r.id);
-  if(activeLevel==='SITE'){segment(lo,hi,.8,base+2.3);text(r.id==='entry-side'?'집 옆 현관 · 신발장 / 실내화':'주방 ↔ 테라스 · 신발장 / 실내화',r.x+r.w/2,r.z+r.d/2,1.5,r.id);}
+ function entryFacade(r){
+  const first=root.children.length,previous=options;
+  if(activeLevel==='SITE')options={...options,lowWalls:false};
+  roomWalls(r,[r]);
+  if(activeLevel==='SITE')for(const mesh of root.children.slice(first))mesh.position.y+=.18;
+  options=previous;
+  if(activeLevel==='SITE')text(r.id==='entry-side'?'미닫이문 현관 · 복도 연결':'신발장 현관 · 맨 왼쪽 주방 연결',r.x+r.w/2,r.z+r.d/2,1.5,r.id);
  }
  function parkingLines(list,aisles,room){for(const t of aisles)box(t.x,t.z,t.w,t.d,.015,'#adc4b7',.075,room);for(const t of list){box(t.x,t.z,t.w,t.d,.015,t.ev?'#bddfcd':'#d3ddd2',.08,room);line([[t.x,.12,t.z+t.d],[t.x,.12,t.z],[t.x+t.w,.12,t.z],[t.x+t.w,.12,t.z+t.d]],'#fbfcf5');text((t.ev?'EV ':'P')+t.number,t.x+t.w/2,t.z+t.d-.5,.7);}}
  function boundaries(){for(const f of fencePieces()){const length=f.end-f.start;if(f.axis==='x')box(f.start,f.z-.08,length,.16,1.5,'#869b83');else box(f.x-.08,f.start,.16,length,1.5,'#869b83');}
@@ -109,7 +110,7 @@ export function createModel(host,onSelect){
  else slab(footprint[level],'#acbdb7',-.3,.3);
   for(const r of list){if(r.id==='parking'){parkingLines(stalls,garageAisles,'parking');drawFurniture(r);text('44대 · EV 8 · 6 m 연결 통로',16,6.5,1.5,'parking');continue;}let f=box(r.x,r.z,r.w,r.d,.075,r.color,r.entrance&&level==='SITE'?.18:r.parent?.012:0,r.id);f.userData.baseColor=r.color;floorMeshes.push(f);
    if(r.id==='pool'){box(r.x,r.z,r.w,r.d,.13,'#68b6bd',.08,r.id,{roughness:.3});}
-   if((level!=='SITE'&&r.id!=='bbq')||r.indoor)roomWalls(r,list);if(r.entrance)entryFacade(r);if(r.id==='gym'){for(let xx=r.x;xx<r.x+r.w;xx++)line([[xx,.085,r.z],[xx,.085,r.z+r.d]],'#9bb3ae');for(let zz=r.z;zz<r.z+r.d;zz++)line([[r.x,.085,zz],[r.x+r.w,.085,zz]],'#9bb3ae');text('자유 주짓수 매트',r.x+4,r.z+12,1.7)}
+   if(!r.entrance&&((level!=='SITE'&&r.id!=='bbq')||r.indoor))roomWalls(r,list);if(r.entrance)entryFacade(r);if(r.id==='gym'){for(let xx=r.x;xx<r.x+r.w;xx++)line([[xx,.085,r.z],[xx,.085,r.z+r.d]],'#9bb3ae');for(let zz=r.z;zz<r.z+r.d;zz++)line([[r.x,.085,zz],[r.x+r.w,.085,zz]],'#9bb3ae');text('자유 주짓수 매트',r.x+4,r.z+12,1.7)}
    if(r.id.startsWith('stairs'))drawStairs(r);else drawFurniture(r);
    if(['futsal','tennis','basket'].includes(r.id))court(r);
    if(r.indoor){for(const xx of [r.x+.12,r.x+r.w-.12])for(const zz of [r.z+.12,r.z+r.d-.12])box(xx-.07,zz-.07,.14,.14,r.height||3,'#8a9c97',0,r.id);}

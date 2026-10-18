@@ -77,11 +77,11 @@ update('kitchen',{x:11.5});update('billiard',{x:19.5});update('bbq',{x:11.5});
 update('pool',{x:1,z:29});update('sun-n',{x:1,z:26});update('sun-s',{x:1,z:35.5});
 update('lawn',{x:18,z:27,note:'수영장 바로 동쪽의 180 m² 캠핑 공간입니다. 5.2 m 그늘막 2동과 로프·앵커, 텐트, 식탁, 의자, 망원경의 설치 공간을 유지하며 남쪽 마당을 줄였습니다. 그늘막의 10인 사용은 배치 목표이며 제조사 정원 표기는 아닙니다.'});
 update('fire-zone',{x:19,z:37.5});
-// Entry zones share the actual corridor/kitchen doors; they add no partition walls.
-const sideDoor=rooms.find(r=>r.id==='hall-1').doors[0];
-const terraceDoor=rooms.find(r=>r.id==='kitchen').doors[0];
-rooms.push(r('entry-side','집 옆 현관','1F',0,6.4,2.6,2.2,'hall',['서쪽 집 옆 출입문 · 폭 1.4 m','벽붙임 신발장 1.2 × 0.35 m','실내화 거치대 0.6 × 0.3 m','수납 앞 보행 폭 1.85 m'],{entrance:true,doors:[{...sideDoor}],note:'서쪽 주택 대문에서 접근하는 공용 복도 현관입니다. 북쪽 벽에 수납을 모아 출입문과 복도 동선을 비웠습니다. 전체 부지 3D에서는 현관 내부를 볼 수 있도록 이 부분을 절개해 표시합니다.'}));
-rooms.push(r('entry-terrace','주방 · 지붕 테라스 출입구','1F',11.5,16.9,6.5,1.9,'hall',['주방 ↔ 지붕 테라스 슬라이딩문 · 폭 2.4 m','벽붙임 신발장 0.8 × 0.28 m','실내화 거치대 0.6 × 0.3 m','문 동쪽 벽 수납 · 출입 통로 유지'],{entrance:true,doors:[{...terraceDoor}],note:'주방 남쪽의 기존 문과 같은 위치입니다. 신발장과 실내화 거치대는 문 동쪽 실내 벽에 붙이고, 식탁은 주방 안쪽으로 0.9 m 옮기고, 수납장은 폭 0.8 m·깊이 0.28 m로 줄여 의자와 출입 동선을 비웠습니다. 현관 영역에 별도 칸막이는 없습니다.'}));
+// Enclosed shoe vestibules, with separate exterior and interior sliding doors.
+update('hall-1',{doors:[],items:['현관 미닫이문으로 연결','거실과 열린 연결','각 오락실 독립 출입']});
+update('kitchen',{doors:[],windows:[],note:'서쪽 거실과는 열린 공간을 유지합니다. 남쪽 신발장 현관의 맨 왼쪽 미닫이문으로 들어간 뒤 별도 외부 미닫이문을 통해 지붕 테라스로 나갑니다.'});
+rooms.push(r('entry-side','집 옆 현관','1F',0,6.4,2.6,2.2,'hall',['사방 벽으로 구획한 신발장 현관','서쪽 외부 미닫이문 · 폭 1.4 m','동쪽 복도 연결 미닫이문 · 폭 1.4 m','벽붙임 신발장 1.2 × 0.35 m','실내화 거치대 0.6 × 0.3 m'],{entrance:true,parent:'hall-1',doors:[{...D('w',.4,1.4),sliding:true},{...D('e',.4,1.4),sliding:true}],note:'외부 → 서쪽 미닫이문 → 신발장 현관 → 동쪽 미닫이문 → 집 안 복도 순서입니다. 신발장과 실내화 거치대는 북쪽 벽에 붙였습니다. 낮은 벽 보기에서는 내부를 볼 수 있도록 벽을 낮춰 표시합니다.'}));
+rooms.push(r('entry-terrace','주방 · 지붕 테라스 출입구','1F',11.5,16.9,6.5,1.9,'hall',['사방 벽으로 구획한 신발장 현관','맨 왼쪽 북쪽 벽: 주방 연결 미닫이문 · 폭 1.2 m','남쪽 벽: 지붕 테라스 미닫이문 · 폭 2.4 m','벽붙임 신발장 0.8 × 0.28 m','실내화 거치대 0.6 × 0.3 m'],{entrance:true,parent:'kitchen',doors:[{...D('s',1.6,2.4),sliding:true},{...D('n',.15,1.2),sliding:true}],windows:[{side:'s',at:5.5,width:.8,height:.6,sill:1.4}],note:'주방 연결문은 신발장 구역의 맨 왼쪽 북쪽 벽에 있습니다. 주방 → 왼쪽 미닫이문 → 벽으로 분리된 신발장 현관 → 남쪽 외부 미닫이문 → 지붕 테라스로 이어집니다. 축소한 신발장과 실내화 거치대는 남쪽 문 동쪽 벽에 유지하며, 식탁은 주방 안쪽으로 옮긴 상태를 유지합니다.'}));
 export const houseEntrances=rooms.filter(r=>r.entrance);
 export const levelNames={SITE:'전체 부지',B1:'지하 1층','1F':'1층','2F':'2층'};
 export const bounds={SITE:{x:-12,z:-7,w:124,d:85},B1:{x:-10,z:-5,w:51,d:47},'1F':{x:-2,z:-3,w:40,d:32},'2F':{x:-2,z:-3,w:40,d:23}};

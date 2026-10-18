@@ -1,4 +1,4 @@
-import {stalls} from './rooms.js?v=20261018-minimal';
+import {stalls} from './rooms.js?v=20261018-enclosed-entries';
 // All bounding sizes and positions are metres, shared without rescaling by SVG and 3D.
 export function furnishings(r){
  const a=[];
