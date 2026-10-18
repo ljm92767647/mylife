@@ -1,8 +1,8 @@
 import {parcels,ramp,gardenPath,gates,fencePieces,estateOutline,garageOutline,outdoorStalls,outdoorAisles,garageAisles} from './site-layout.js';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {rooms,houseEntrances,bounds,footprint,stalls} from './rooms.js';
-import {furnishings} from './furniture.js';
+import {rooms,houseEntrances,bounds,footprint,stalls} from './rooms.js?v=20261018-minimal';
+import {furnishings} from './furniture.js?v=20261018-minimal';
 export function createModel(host,onSelect){
  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor('#e8eeec');renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;host.append(renderer.domElement);
  const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(42,1,.1,600);const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.09;controls.maxPolarAngle=Math.PI*.48;controls.minDistance=5;controls.maxDistance=350;controls.target.set(0,0,0);
