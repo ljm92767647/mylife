@@ -27,7 +27,7 @@ export function furnishings(r){
  }
  switch(r.id){
  case 'entry-side':F('현관 벽붙임 신발장',.2,.0,1.2,.35,1.1,'#b39c7c','shoecabinet');F('현관 실내화 거치대',1.55,.0,.6,.3,.8,'#78968c','slipperrack');break;
- case 'entry-terrace':F('테라스 입구 벽붙임 신발장',4.3,1.5,1.2,.35,1.1,'#b39c7c','shoecabinet');F('테라스 입구 실내화 거치대',5.7,1.55,.6,.3,.8,'#78968c','slipperrack');break;
+ case 'entry-terrace':F('테라스 입구 벽붙임 신발장',4.3,1.57,.8,.28,.9,'#b39c7c','shoecabinet');F('테라스 입구 실내화 거치대',5.7,1.55,.6,.3,.8,'#78968c','slipperrack');break;
  case 'parking':
   [0,3,6,12,18,25,33,40].forEach((i,k)=>{const s=stalls[i];F('P'+s.number+' · SUV 5.06 × 1.98 m',s.x-r.x+.36,s.z-r.z+.22,1.98,5.06,1.8,['#eef0e9','#527585','#293e48'][k%3],'car')});
   for(let i=0;i<8;i++)F('EV '+(i+1)+' 충전기',stalls[i].x-r.x+1.1,-1.8-r.z,.45,.25,1.3,'#3a9b82','charger');break;
@@ -44,7 +44,7 @@ export function furnishings(r){
  case 'board':F('72인치 8인 원탁',2.0855,2.1,1.829,1.829,.762,'#b99a73','roundtable');for(let i=0;i<8;i++){const angle=i*Math.PI/4;const f=chair(3+1.43*Math.cos(angle)-.225,3.0145+1.43*Math.sin(angle)-.235,'n','원탁 의자 '+(i+1));f.angle=-angle-Math.PI/2} shelf(.3,.15,5.4);break;
  case 'living':TV(.08,2.1,2.235,'e','서쪽 벽 100인치 TV');F('벽쪽 미디어 콘솔',.18,1.8,.45,3,.5,'#b7a081','table');sofa(4.5,.3,'w');sofa(4.5,3.65,'w');F('커피 테이블 A',2.7,1.2,.8,1.2,.42,'#b99f7e','table');F('커피 테이블 B',2.7,4.55,.8,1.2,.42,'#b99f7e','table');F('PlayStation',.2,3.4,.1,.26,.39,'#e5ece8');for(const z of [1.3,5])F('스피커',.1,z,.32,.25,1.1,'#254047');F('휴식용 원형 티 테이블',8.4,4.75,.8,.8,.55,'#b99f7e','roundtable');chair(7.65,4.9,'e','휴식 의자');chair(9.45,4.9,'w','휴식 의자');break;
  case 'kitchen':
-  F('벽면 조리대',2,.15,5.7,.6,.9,'#c2b59b','counter');F('싱크대',4,.18,.8,.5,.94,'#bdc9c1','sink');F('60 cm 쿡탑',6.5,.18,.6,.52,.95,'#31434a','mixer');F('냉장고',7.05,1.2,.9,.72,1.83,'#bac9c5');F('60 cm 오븐',7.15,2,.6,.6,.9,'#384d51');F('60 cm 식기세척기',7.15,2.65,.6,.6,.85,'#aebfba');F('아일랜드',2.8,2.15,3,1.1,.9,'#c1b293','table');table(2.7,6.2,2.35,1);break;
+  F('벽면 조리대',2,.15,5.7,.6,.9,'#c2b59b','counter');F('싱크대',4,.18,.8,.5,.94,'#bdc9c1','sink');F('60 cm 쿡탑',6.5,.18,.6,.52,.95,'#31434a','mixer');F('냉장고',7.05,1.2,.9,.72,1.83,'#bac9c5');F('60 cm 오븐',7.15,2,.6,.6,.9,'#384d51');F('60 cm 식기세척기',7.15,2.65,.6,.6,.85,'#aebfba');F('아일랜드',2.8,2.15,3,1.1,.9,'#c1b293','table');table(2.7,5.3,2.35,1);break;
  case 'billiard':F('Brunswick 9 ft 포켓볼',1.6,3.2,1.64465,2.911475,.81915,'#327b70','pooltable');F('4구 당구대',6.2,3.2,1.7,3.10,.8,'#427b9c','carom');for(const x of [.7,5.7]){sofa(x,.15,'s');sofa(x,9.1,'n')}break;
  case 'laundry':F('세탁기',.2,.2,.6,.65,.85,'#e2e9e2','washer');F('건조기',1.1,.2,.6,.65,.85,'#dce5df','washer');break;
  case 'linen-1':case 'store-1':shelf(.2,.2,1.6,.5);break;
