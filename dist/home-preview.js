@@ -65,7 +65,7 @@
     first.style.position = 'relative';
     original.forEach(node => { node.style.opacity = '0'; });
     first.append(overlay);
-    interval = setInterval(advance, 4000);
+    interval = setInterval(advance, 3200);
   }
 
   function stop() {
