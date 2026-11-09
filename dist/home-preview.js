@@ -22,7 +22,7 @@
   });
 
   const original = [...first.children];
-  let index = 0, interval, animation, stopped = false, touchStart;
+  let index = 0, interval, animation;
 
   function reset() {
     clearInterval(interval);
@@ -59,29 +59,22 @@
 
   function sync() {
     reset();
-    if (stopped || scrollY > 0 || !mobile.matches || reducedMotion.matches || document.hidden) return;
+    if (scrollY > 0 || !mobile.matches || reducedMotion.matches || document.hidden) return;
     index = 0;
     panels.forEach((panel, i) => { panel.hidden = i !== 0; });
     first.style.position = 'relative';
     original.forEach(node => { node.style.opacity = '0'; });
     first.append(overlay);
-    interval = setInterval(advance, 3600);
+    interval = setInterval(advance, 3700);
   }
 
-  function stop() {
+  addEventListener('scroll', () => {
     if (!mobile.matches) return;
-    stopped = true;
-    reset();
-  }
-
-  addEventListener('scroll', () => { if (scrollY > 0) stop(); }, { passive: true });
-  addEventListener('wheel', event => { if (event.deltaY) stop(); }, { passive: true });
-  addEventListener('touchstart', event => {
-    touchStart = event.touches.length === 1 ? event.touches[0].clientY : undefined;
-  }, { passive: true });
-  addEventListener('touchmove', event => {
-    if (touchStart !== undefined && event.touches.length === 1 &&
-        Math.abs(event.touches[0].clientY - touchStart) > 8) stop();
+    if (scrollY > 0) {
+      if (interval !== undefined) reset();
+    } else if (interval === undefined) {
+      sync();
+    }
   }, { passive: true });
   mobile.addEventListener('change', sync);
   reducedMotion.addEventListener('change', sync);
