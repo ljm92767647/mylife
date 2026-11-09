@@ -39,7 +39,7 @@
     const outgoing = overlay.animate([
       { opacity: 1, filter: 'blur(0px)' },
       { opacity: .08, filter: 'blur(8px)' }
-    ], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+    ], { duration: 580, easing: 'ease-in-out', fill: 'forwards' });
     animation = outgoing;
     try {
       await outgoing.finished;
@@ -54,7 +54,7 @@
     animation = overlay.animate([
       { opacity: .08, filter: 'blur(8px)' },
       { opacity: 1, filter: 'blur(0px)' }
-    ], { duration: 440, easing: 'ease-out' });
+    ], { duration: 700, easing: 'ease-in-out' });
   }
 
   function sync() {
