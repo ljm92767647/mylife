@@ -54,7 +54,7 @@
     animation = overlay.animate([
       { opacity: .08, filter: 'blur(8px)' },
       { opacity: 1, filter: 'blur(0px)' }
-    ], { duration: 700, easing: 'ease-in-out' });
+    ], { duration: 1420, easing: 'ease-in-out' });
   }
 
   function sync() {
@@ -65,7 +65,7 @@
     first.style.position = 'relative';
     original.forEach(node => { node.style.opacity = '0'; });
     first.append(overlay);
-    interval = setInterval(advance, 2000);
+    interval = setInterval(advance, 4000);
   }
 
   function stop() {
